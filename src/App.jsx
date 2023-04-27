@@ -1,14 +1,7 @@
-import Navbar from "./components/globalcomponents/Navbar";
-import Slider from "./components/globalcomponents/Slider";
-import FPanel from "./components/FPanel";
+import { useRoutes } from "react-router-dom";
+import routes from "./routes/Routes.jsx";
 function App() {
-  return (
-    <div>
-      <Navbar />
-      <Slider />
-      <FPanel/>
-    </div>
-  );
+  return useRoutes(routes);
 }
 
 export default App;
