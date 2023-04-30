@@ -1,68 +1,70 @@
 import React, { useState } from "react";
 import Loader from "./globalcomponents/Loader";
 import InfiniteScroll from "react-infinite-scroll-component";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 import { Link } from "react-router-dom";
 import { AiOutlineSearch } from "react-icons/ai";
 import { RxReset } from "react-icons/rx";
 const AllNews = () => {
-  const url = "https://djangoresttest.online/api/news/";
-  const [items, setItems] = useState([]);
-  const [page, setPage] = useState(2);
-  const [hasMore, setHasMore] = useState(true);
   const [search, setSearch] = useState("");
-  const [mainData,setMainData]=useState('')
+  const [page, setPage] = useState(2);
+  const url = `https://djangoresttest.online/api/news/?page=1&search=${search}`;
+  const nextPageUrl = `https://djangoresttest.online/api/news/?page=${page}&search=${search}`;
+  const [items, setItems] = useState([]);
+  const [hasMore, setHasMore] = useState(true);
   const [searchActive, setSearchActive] = useState(false);
-  const [searchDatas, setSearchDatas] = useState([]);
-  const [searchStatus, setSearchStatus] = useState("");
-  async function fetchData() {
-    const res = await fetch(url); 
+  const { data, error, isLoading } = useSWR("news", async () => {
+    const res = await fetch(url);
     return res.json();
-  }
-  const searchData = async () => {
-    setSearchActive(true);
+  });
+  const fetchOtherData = async (page) => {
+    setHasMore(data?.next != null ? true : false);
     try {
-      setSearchStatus("loading");
-      const url = `https://djangoresttest.online/api/news/?search=${search}`;
-      const res = await fetch(url);
-      const data = await res.json();
-      setSearchDatas(data);
-      setSearchStatus("");
-    } catch (error) {
-      console.error(error);
-      setSearchStatus("Axtardığız xəbər tapılmadı!");
+      const data = await fetch(nextPageUrl);
+      const res = await data.json();
+      setPage(searchData?.next !== null ? page + 1 : 2);
+      setItems([...items, ...res?.results]);
+      setHasMore(res?.next !== null ? true : false);
+    } catch (e) {
+      console.log(e);
     }
   };
-  const resetSearch=()=>{
-    setSearchActive(false);
-  }
-  const fetchOtherData = (pageNumber) => {
-    fetch(`https://djangoresttest.online/api/news/?page=${pageNumber}`)
-      .then((response) => response.json())
-      .then((data) => {
-        const newItems = data.results;
-        const nextPage = pageNumber + 1;
-        setItems([...items, ...newItems]);
-        setPage(nextPage);
-        if (data.next === null) return setHasMore(false);
-      })
-      .catch((error) => console.error(error));
+  const searchData = async (e) => {
+    e.preventDefault();
+    setSearchActive(true);
+    setItems([]);
+    const res = await fetch(url);
+    const searchData = await res.json();
+    setPage(searchData?.next !== null ? page + 1 : 2);
+    setHasMore(searchData?.next !== null ? true : false);
+    mutate("news", searchData, false);
   };
-  const { data, error, isLoading } = useSWR("news", fetchData);
+  const resetSearch = async (e) => {
+    e.preventDefault();
+    setSearchActive(false);
+    setSearch("");
+    setItems([]);
+    const res = await fetch(
+      "https://djangoresttest.online/api/news/?page=1&search="
+    );
+    const searchData = await res.json();
+    setPage(2);
+    setHasMore(searchData?.next != null ? true : false);
+    mutate("news", searchData, false);
+  };
   if (isLoading) return <Loader />;
   if (error) return "Error: " + error;
-  console.log(searchActive)
-  console.log("status : ", searchStatus);
   return (
     <>
       <div className='h-[200px] py-10 bg-sky-500 text-white text-3xl flex items-end'>
         <div className='container'>Bütün xəbərlər</div>
       </div>
       <div className='bg-[#f9f9f9f9]'>
-        <div className='container'>
+        <div className='container min-h-[50vh]'>
           <div className='py-6 flex'>
             <input
               onChange={(e) => setSearch(e.target.value)}
+              value={search}
               type='text'
               className='outline-none w-[500px] bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5'
               placeholder='axtar'
@@ -75,8 +77,8 @@ const AllNews = () => {
               <AiOutlineSearch />
             </button>
             <button
-              disabled={searchActive===false}
-              onClick={() => resetSearch}
+              disabled={searchActive === false}
+              onClick={resetSearch}
               className='flex items-center text-lg ml-4 border px-8 bg-red-500 text-white disabled:bg-red-300 disabled:cursor-not-allowed'
             >
               Sıfırla <RxReset className='ml-2' />{" "}
@@ -121,6 +123,11 @@ const AllNews = () => {
               );
             })}
           </InfiniteScroll>
+          {searchActive === true && data?.results?.length === 0 && (
+            <div className='text-3xl text-red-600 h-[50vh] flex justify-center items-center'>
+              Axtarışa uyğun xəbər tapılmadı!
+            </div>
+          )}
         </div>
       </div>
     </>

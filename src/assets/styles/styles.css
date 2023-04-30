@@ -15,7 +15,12 @@
 .f-panel:hover {
   box-shadow: 0px 0px 6px 6px rgba(225, 225, 225, 0.92);
 }
-
+.short-title {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
 /* loading */
 .lds-spinner {
   color: official;
