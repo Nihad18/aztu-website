@@ -10,7 +10,7 @@ import { AiOutlineCalendar, AiOutlineEye } from "react-icons/ai";
 const NewsDetail = () => {
   const params = useParams();
   const navigate = useNavigate();
-  const url = `http://localhost:8000/api/news-detail/${params.slug}`;
+  const url = `http://localhost:80/api/news-detail/${params.slug}`;
   async function fetchData() {
     const res = await fetch(url);
     return res.json();
@@ -70,8 +70,6 @@ const NewsDetail = () => {
                 arrows:true,
                 rewind: true,
                 autoplay: true,
-                drag: "free",
-                type: "loop",
                 perPage: 4,
                 gap:"1rem",
                 breakpoints: {

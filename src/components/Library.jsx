@@ -15,8 +15,8 @@ const Library = () => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(2);
   const [category, setCategory] = useState("");
-  const url = `http://localhost:8000/api/books/?page=1&size=4&category=${category}&search=${search}`;
-  const nextPageUrl = `http://localhost:8000/api/books/?page=${page}&size=4&category=${category}&search=${search}`;
+  const url = `http://localhost:80/api/books/?page=1&size=4&category=${category}&search=${search}`;
+  const nextPageUrl = `http://localhost:80/api/books/?page=${page}&size=4&category=${category}&search=${search}`;
   const [items, setItems] = useState([]);
   const [hasMore, setHasMore] = useState(true);
   const [searchActive, setSearchActive] = useState(false);
@@ -29,7 +29,7 @@ const Library = () => {
   });
   const categories = useSWR("book-categories", async () => {
     const res = await fetch(
-      "http://localhost:8000/api/book-categories",
+      "http://localhost:80/api/book-categories",
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -72,7 +72,7 @@ const Library = () => {
     setItems([]);
     setCategory("");
     const res = await fetch(
-      "https://djangoresttest.online/api/books/?page=1&size=4&search=",
+      "http://djangoresttest.online/api/books/?page=1&size=4&search=",
       {
         headers: { Authorization: `Bearer ${token}` },
       }
