@@ -3,7 +3,7 @@ import Loader from "./globalcomponents/Loader";
 import useSWR from "swr";
 import { Link } from "react-router-dom";
 const News = () => {
-  const url = "https://djangoresttest.online/api/news/";
+  const url = "http://localhost:8000/api/news/";
   async function fetchData() {
     const res = await fetch(url);
     return res.json();

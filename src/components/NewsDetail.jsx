@@ -10,7 +10,7 @@ import { AiOutlineCalendar, AiOutlineEye } from "react-icons/ai";
 const NewsDetail = () => {
   const params = useParams();
   const navigate = useNavigate();
-  const url = `https://djangoresttest.online/api/news-detail/${params.slug}`;
+  const url = `http://localhost:8000/api/news-detail/${params.slug}`;
   async function fetchData() {
     const res = await fetch(url);
     return res.json();

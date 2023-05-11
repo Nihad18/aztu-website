@@ -14,7 +14,7 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
     axios
-      .post("https://djangoresttest.online/api/token/", data)
+      .post("http://localhost:8000/api/token/", data)
       .then((res) => {
         setIsLoading(false);
         setData({ username: "", password: "" });

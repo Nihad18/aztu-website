@@ -8,8 +8,9 @@ import { RxReset } from "react-icons/rx";
 const AllNews = () => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(2);
-  const url = `https://djangoresttest.online/api/news/?page=1&search=${search}`;
-  const nextPageUrl = `https://djangoresttest.online/api/news/?page=${page}&search=${search}`;
+  const [category, setCategory] = useState("");
+  const url = `http://localhost:8000/api/news/?page=1&category=${category}&search=${search}`;
+  const nextPageUrl = `http://localhost:8000/api/news/?page=${page}&category=${category}&search=${search}`;
   const [items, setItems] = useState([]);
   const [hasMore, setHasMore] = useState(true);
   const [searchActive, setSearchActive] = useState(false);
@@ -17,6 +18,14 @@ const AllNews = () => {
     const res = await fetch(url);
     return res.json();
   });
+  //-----------------------------------------------
+  const categories = useSWR("news-categories", async () => {
+    const res = await fetch(
+      "http://localhost:8000/api/news-categories"
+    );
+    return res.json();
+  });
+  //-----------------------------------------------
   const fetchOtherData = async (page) => {
     setHasMore(data?.next != null ? true : false);
     try {
@@ -35,7 +44,7 @@ const AllNews = () => {
     setItems([]);
     const res = await fetch(url);
     const searchData = await res.json();
-    setPage(searchData?.next !== null ? page + 1 : 2);
+    setPage(searchData?.next !== null ? (page === 2 ? 2 : page + 1) : 2);
     setHasMore(searchData?.next !== null ? true : false);
     mutate("news", searchData, false);
   };
@@ -62,6 +71,22 @@ const AllNews = () => {
       <div className='bg-[#f9f9f9f9]'>
         <div className='container min-h-[50vh]'>
           <div className='py-6 flex'>
+            <select
+              onChange={(e) => {
+                setCategory(e.target.value);
+              }}
+              value={category}
+              className='w-[200px] outline-none bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5'
+            >
+              <option value={""} defaultValue>
+                Kateqoriya : Bütün
+              </option>
+              {categories?.data?.map((item, index) => (
+                <option key={index} value={item.slug}>
+                  {item.name}
+                </option>
+              ))}
+            </select>
             <input
               onChange={(e) => setSearch(e.target.value)}
               value={search}
@@ -70,9 +95,9 @@ const AllNews = () => {
               placeholder='axtar'
             />
             <button
-              disabled={search.length < 1}
+              disabled={search.length < 1 && category === ""}
               onClick={searchData}
-              className='disabled:cursor-not-allowed text-2xl border rounded px-8 ml-4 bg-green-500 text-white'
+              className='disabled:cursor-not-allowed disabled:bg-green-300 text-2xl border rounded px-8 ml-4 bg-green-500 text-white'
             >
               <AiOutlineSearch />
             </button>

@@ -14,17 +14,29 @@ const Library = () => {
   const { token } = useContext(Context);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(2);
-  const url = `https://djangoresttest.online/api/books/?page=1&size=4&search=${search}`;
-  const nextPageUrl = `https://djangoresttest.online/api/books/?page=${page}&size=4&search=${search}`;
+  const [category, setCategory] = useState("");
+  const url = `http://localhost:8000/api/books/?page=1&size=4&category=${category}&search=${search}`;
+  const nextPageUrl = `http://localhost:8000/api/books/?page=${page}&size=4&category=${category}&search=${search}`;
   const [items, setItems] = useState([]);
   const [hasMore, setHasMore] = useState(true);
   const [searchActive, setSearchActive] = useState(false);
+  //-----------------------------------------------------------
   const { data, error, isLoading } = useSWR("books", async () => {
     const res = await fetch(url, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return res.json();
   });
+  const categories = useSWR("book-categories", async () => {
+    const res = await fetch(
+      "http://localhost:8000/api/book-categories",
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return res.json();
+  });
+  // infinite pagination---------------------
   const fetchOtherData = async (page) => {
     setHasMore(data?.next != null ? true : false);
     try {
@@ -39,6 +51,7 @@ const Library = () => {
       console.log(e);
     }
   };
+  //-------search------------------------------------
   const searchData = async (e) => {
     e.preventDefault();
     setSearchActive(true);
@@ -47,15 +60,17 @@ const Library = () => {
       headers: { Authorization: `Bearer ${token}` },
     });
     const searchData = await res.json();
-    setPage(searchData?.next !== null ? page + 1 : 2);
+    setPage(searchData?.next !== null ? (page === 2 ? 2 : page + 1) : 2);
     setHasMore(searchData?.next !== null ? true : false);
     mutate("books", searchData, false);
   };
+  //------reset search-----------------------------
   const resetSearch = async (e) => {
     e.preventDefault();
     setSearchActive(false);
     setSearch("");
     setItems([]);
+    setCategory("");
     const res = await fetch(
       "https://djangoresttest.online/api/books/?page=1&size=4&search=",
       {
@@ -67,6 +82,7 @@ const Library = () => {
     setHasMore(searchData?.next != null ? true : false);
     mutate("books", searchData, false);
   };
+  //----------------------------------------------
   if (isLoading) return <Loader />;
   if (error) return "Error: " + error;
   return (
@@ -79,6 +95,22 @@ const Library = () => {
           {token ? (
             <>
               <div className='py-6 flex'>
+                <select
+                  onChange={(e) => {
+                    setCategory(e.target.value);
+                  }}
+                  value={category}
+                  className='w-[200px] outline-none bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5'
+                >
+                  <option value={""} defaultValue>
+                    Kateqoriya : Bütün
+                  </option>
+                  {categories?.data?.map((item, index) => (
+                    <option key={index} value={item.slug}>
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
                 <input
                   onChange={(e) => setSearch(e.target.value)}
                   value={search}
@@ -87,7 +119,7 @@ const Library = () => {
                   placeholder='axtar'
                 />
                 <button
-                  disabled={search.length < 1}
+                  disabled={search.length < 1 && category === ""}
                   onClick={searchData}
                   className='disabled:cursor-not-allowed disabled:bg-green-300 text-2xl border rounded px-8 ml-4 bg-green-500 text-white'
                 >
@@ -107,7 +139,7 @@ const Library = () => {
                     return (
                       <div
                         key={index}
-                        className='w-[250px] max-h-[400px] px-6 py-4 m-6 bg-white border border-gray-200 rounded-lg shadow'
+                        className='w-[250px] min-h-[386px] px-6 py-4 m-6 bg-white border border-gray-200 rounded-lg shadow'
                       >
                         <div className='max-w-4/5'>
                           <img
@@ -115,11 +147,15 @@ const Library = () => {
                             src={item.image}
                           />
                         </div>
-                        <a href='#'>
-                          <h5 className='my-3 text-xl text-gray-700 short-title'>
-                            {item.title}
-                          </h5>
-                        </a>
+                        <h5 className='my-3 text-xl text-gray-700 short-title'>
+                          {item.title}
+                        </h5>
+                        <h5 className='my-3 text-xl text-gray-700 short-title'>
+                          {"M : "} {item.author}
+                        </h5>
+                        <h5 className='my-3 text-xl text-gray-700 short-title'>
+                          {"K : "} {item.category}
+                        </h5>
                         <p className='mb-3 flex'>
                           <span className='flex items-center text-gray-700'>
                             <AiOutlineCalendar /> {item.creation_date}
@@ -152,7 +188,7 @@ const Library = () => {
                       return (
                         <div
                           key={index}
-                          className='w-[280px] max-h-[386px] px-6 py-4 m-6 bg-white border border-gray-200 rounded-lg shadow'
+                          className='w-[280px] min-h-[386px] px-6 py-4 m-6 bg-white border border-gray-200 rounded-lg shadow'
                         >
                           <div className='max-w-4/5'>
                             <img
@@ -160,11 +196,15 @@ const Library = () => {
                               src={item.image}
                             />
                           </div>
-                          <a href='#'>
-                            <h5 className='my-3 text-xl text-gray-700 short-title'>
-                              {item.title}
-                            </h5>
-                          </a>
+                          <h5 className='my-3 text-xl text-gray-700 short-title'>
+                            {item.title}
+                          </h5>
+                          <h5 className='my-3 text-xl text-gray-700 short-title'>
+                            {"M : "} {item.author}
+                          </h5>
+                          <h5 className='my-3 text-xl text-gray-700 short-title'>
+                            {"K : "} {item.category}
+                          </h5>
                           <p className='mb-3 flex'>
                             <span className='flex items-center text-gray-700'>
                               <AiOutlineCalendar /> {item.creation_date}
