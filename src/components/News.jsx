@@ -3,7 +3,7 @@ import Loader from "./globalcomponents/Loader";
 import useSWR from "swr";
 import { Link } from "react-router-dom";
 const News = () => {
-  const url = "http://localhost:80/api/news/";
+  const url = "http://armud.az/api/news/";
   async function fetchData() {
     const res = await fetch(url);
     return res.json();

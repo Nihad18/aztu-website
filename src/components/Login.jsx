@@ -14,7 +14,7 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
     axios
-      .post("http://localhost:80/api/token/", data)
+      .post("http://armud.az/api/token/", data)
       .then((res) => {
         setIsLoading(false);
         setData({ username: "", password: "" });
