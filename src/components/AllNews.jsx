@@ -54,7 +54,7 @@ const AllNews = () => {
     setSearch("");
     setItems([]);
     const res = await fetch(
-      "http://djangoresttest.online/api/news/?page=1&search="
+      "http://localhost:80/api/news/?page=1&search="
     );
     const searchData = await res.json();
     setPage(2);

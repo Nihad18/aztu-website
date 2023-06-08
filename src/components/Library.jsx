@@ -72,7 +72,7 @@ const Library = () => {
     setItems([]);
     setCategory("");
     const res = await fetch(
-      "http://djangoresttest.online/api/books/?page=1&size=4&search=",
+      "http://localhost:80/api/books/?page=1&size=4",
       {
         headers: { Authorization: `Bearer ${token}` },
       }
