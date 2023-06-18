@@ -9,8 +9,8 @@ const AllNews = () => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(2);
   const [category, setCategory] = useState("");
-  const url = `http://armud.az/api/news/?page=1&category=${category}&search=${search}`;
-  const nextPageUrl = `http://armud.az/api/news/?page=${page}&category=${category}&search=${search}`;
+  const url = `https://armud.az/api/news/?page=1&category=${category}&search=${search}`;
+  const nextPageUrl = `https://armud.az/api/news/?page=${page}&category=${category}&search=${search}`;
   const [items, setItems] = useState([]);
   const [hasMore, setHasMore] = useState(true);
   const [searchActive, setSearchActive] = useState(false);
@@ -21,7 +21,7 @@ const AllNews = () => {
   //-----------------------------------------------
   const categories = useSWR("news-categories", async () => {
     const res = await fetch(
-      "http://armud.az/api/news-categories"
+      "https://armud.az/api/news-categories"
     );
     return res.json();
   });
@@ -54,7 +54,7 @@ const AllNews = () => {
     setSearch("");
     setItems([]);
     const res = await fetch(
-      "http://armud.az/api/news/?page=1&search="
+      "https://armud.az/api/news/?page=1&search="
     );
     const searchData = await res.json();
     setPage(2);

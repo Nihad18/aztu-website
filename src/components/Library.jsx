@@ -15,8 +15,8 @@ const Library = () => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(2);
   const [category, setCategory] = useState("");
-  const url = `http://armud.az/api/books/?page=1&size=4&category=${category}&search=${search}`;
-  const nextPageUrl = `http://armud.az/api/books/?page=${page}&size=4&category=${category}&search=${search}`;
+  const url = `https://armud.az/api/books/?page=1&size=4&category=${category}&search=${search}`;
+  const nextPageUrl = `https://armud.az/api/books/?page=${page}&size=4&category=${category}&search=${search}`;
   const [items, setItems] = useState([]);
   const [hasMore, setHasMore] = useState(true);
   const [searchActive, setSearchActive] = useState(false);
@@ -29,7 +29,7 @@ const Library = () => {
   });
   const categories = useSWR("book-categories", async () => {
     const res = await fetch(
-      "http://armud.az/api/book-categories",
+      "https://armud.az/api/book-categories",
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -72,7 +72,7 @@ const Library = () => {
     setItems([]);
     setCategory("");
     const res = await fetch(
-      "http://armud.az/api/books/?page=1&size=4",
+      "https://armud.az/api/books/?page=1&size=4",
       {
         headers: { Authorization: `Bearer ${token}` },
       }
